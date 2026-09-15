@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>signal / select</title>
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <div class="stage" id="stage">
+
+    <div class="edge edge-left">select a track</div>
+
+    <div class="menu">
+
+      <header class="menu-head">
+        <h1 class="wordmark">auraea</h1>
+        <div class="menu-meta">
+          <span id="trackCount">0 tracks</span>
+          <span class="dot">·</span>
+          <span id="totalTime">0:00 total</span>
+        </div>
+      </header>
+
+      <div class="list" id="list" role="listbox" aria-label="Track list">
+        <!-- rows injected by app.js -->
+      </div>
+
+      <footer class="now-bar" id="nowBar">
+        <div class="now-index" id="nowIndex">00</div>
+        <div class="now-body">
+          <div class="now-title" id="nowTitle">nothing loaded</div>
+          <div class="now-tag" id="nowTag">choose a track to begin</div>
+        </div>
+        <button class="now-enter" id="nowEnter" disabled>enter</button>
+      </footer>
+
+    </div>
+
+  </div>
+
+  <div class="invert-corner invert-tr" aria-hidden="true"></div>
+  <div class="invert-corner invert-bl" aria-hidden="true"></div>
+
+  <script src="app.js"></script>
+</body>
+</html>
