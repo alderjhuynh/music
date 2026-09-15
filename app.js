@@ -112,6 +112,7 @@ async function loadTracks(){
     const res = await fetch(MANIFEST_URL, { cache: 'no-store' });
     if (!res.ok) throw new Error(`manifest fetch failed: ${res.status}`);
     const manifest = await res.json();
+    // preserve album order
     TRACKS = manifest.map(t => ({
       id: t.id,
       title: t.title,
