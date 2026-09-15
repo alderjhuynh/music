@@ -136,6 +136,7 @@ html, body{
 .row{
   --reveal: 0;
   position: relative;
+  isolation: isolate;
   display: grid;
   grid-template-columns: clamp(48px, 5vw, 72px) 1fr auto auto;
   align-items: center;
@@ -240,6 +241,7 @@ html, body{
   background: var(--mark);
   vertical-align: middle;
   animation: pulse 1.8s ease-in-out infinite;
+  will-change: opacity;
 }
 @keyframes pulse{
   0%, 100%{ opacity: 1; }
