@@ -1,15 +1,18 @@
 const VISUALIZER_ORIGIN = 'https://visualize.auraea.fyi';
-const MANIFEST_URL = `${VISUALIZER_ORIGIN}/manifest.json`;
+const ALBUMS_URL = `${VISUALIZER_ORIGIN}/albums.json`;
 
 const listEl = document.getElementById('list');
 const trackCountEl = document.getElementById('trackCount');
 const totalTimeEl = document.getElementById('totalTime');
+const albumSwitcherEl = document.getElementById('albumSwitcher');
 const nowIndex = document.getElementById('nowIndex');
 const nowTitle = document.getElementById('nowTitle');
 const nowTag = document.getElementById('nowTag');
 const nowEnter = document.getElementById('nowEnter');
 const stage = document.getElementById('stage');
 
+let ALBUMS = [];
+let currentAlbum = null;
 let TRACKS = [];
 let current = -1;
 
@@ -27,6 +30,72 @@ function setStatus(message){
   totalTimeEl.textContent = '0:00 total';
 }
 
+function applyTheme(theme){
+  const isInitial = !document.body.dataset.theme;
+  const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (isInitial || prefersReduced){
+    document.body.dataset.theme = theme;
+    return Promise.resolve();
+  }
+  if (document.startViewTransition){
+    try{
+      const vt = document.startViewTransition(() => {
+        document.body.dataset.theme = theme;
+      });
+      return vt.finished.catch(() => {});
+    } catch (_){}
+  }
+  return new Promise((resolve) => {
+    const el = stage;
+    const prev = el.style.transition;
+    el.style.transition = 'opacity 220ms ease';
+    el.style.opacity = '0.18';
+    setTimeout(() => {
+      document.body.dataset.theme = theme;
+      requestAnimationFrame(() => {
+        el.style.opacity = '1';
+        setTimeout(() => {
+          el.style.transition = prev;
+          if (!el.style.transition) el.style.removeProperty('transition');
+          el.style.removeProperty('opacity');
+          resolve();
+        }, 380);
+      });
+    }, 220);
+  });
+}
+
+function renderAlbumSwitcher(){
+  if (!albumSwitcherEl) return;
+  albumSwitcherEl.innerHTML = '';
+  if (ALBUMS.length < 2) return;
+  ALBUMS.forEach((a) => {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.textContent = a.title;
+    btn.classList.toggle('active', currentAlbum && a.id === currentAlbum.id);
+    btn.addEventListener('click', () => {
+      if (currentAlbum && a.id === currentAlbum.id) return;
+      switchAlbum(a);
+    });
+    albumSwitcherEl.appendChild(btn);
+  });
+}
+
+async function switchAlbum(album){
+  current = -1;
+  currentAlbum = album;
+  document.body.dataset.album = album.id;
+  await applyTheme(album.theme);
+  renderAlbumSwitcher();
+  nowIndex.textContent = '00';
+  nowTitle.textContent = 'nothing loaded';
+  nowTag.textContent = 'choose a track to begin';
+  nowEnter.disabled = true;
+  nowEnter.textContent = 'enter';
+  await loadTracksForAlbum(album);
+}
+
 function render(){
   listEl.innerHTML = '';
 
@@ -41,11 +110,12 @@ function render(){
     row.setAttribute('role', 'option');
     row.setAttribute('aria-selected', i === current ? 'true' : 'false');
     row.dataset.index = i;
+    const hideTag = currentAlbum && currentAlbum.id === 'distant-horizons';
     row.innerHTML = `
       <div class="row-index">${pad(i + 1)}</div>
       <div class="row-body">
         <div class="row-title">${t.title}</div>
-        <div class="row-tag">${t.tag}</div>
+        ${hideTag ? '' : `<div class="row-tag">${t.tag}</div>`}
       </div>
       <div class="row-attrs">
         <div><span class="attr-label">key</span><span class="attr-value">${t.key}</span></div>
@@ -87,13 +157,29 @@ function enterTrack(){
   stage.classList.add('is-launching');
   nowEnter.disabled = true;
   nowEnter.textContent = 'loading…';
-  window.location.href = `${VISUALIZER_ORIGIN}/?track=${encodeURIComponent(t.id)}`;
+  const albumParam = currentAlbum ? `album=${encodeURIComponent(currentAlbum.id)}&` : '';
+  window.location.href = `${VISUALIZER_ORIGIN}/?${albumParam}track=${encodeURIComponent(t.id)}`;
 }
 
 nowEnter.addEventListener('click', enterTrack);
 
 // keyboard nav
 document.addEventListener('keydown', (e) => {
+  // lr album switch
+  if (e.key === 'ArrowLeft' || e.key === 'ArrowRight'){
+    if (ALBUMS.length < 2 || !currentAlbum) return;
+    const tag = document.activeElement ? document.activeElement.tagName : '';
+    if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return;
+    e.preventDefault();
+    const idx = ALBUMS.findIndex(a => a.id === currentAlbum.id);
+    if (idx < 0) return;
+    const nextIdx = e.key === 'ArrowRight'
+      ? (idx + 1) % ALBUMS.length
+      : (idx - 1 + ALBUMS.length) % ALBUMS.length;
+    if (nextIdx !== idx) switchAlbum(ALBUMS[nextIdx]);
+    return;
+  }
+
   if (!TRACKS.length) return;
   if (e.key === 'ArrowDown'){
     e.preventDefault();
@@ -106,13 +192,13 @@ document.addEventListener('keydown', (e) => {
   }
 });
 
-async function loadTracks(){
+async function loadTracksForAlbum(album){
   setStatus('loading tracks…');
+  const manifestUrl = `${VISUALIZER_ORIGIN}/${album.path}manifest.json`;
   try {
-    const res = await fetch(MANIFEST_URL, { cache: 'no-store' });
+    const res = await fetch(manifestUrl, { cache: 'no-store' });
     if (!res.ok) throw new Error(`manifest fetch failed: ${res.status}`);
     const manifest = await res.json();
-    // preserve album order
     TRACKS = manifest.map(t => ({
       id: t.id,
       title: t.title,
@@ -122,11 +208,28 @@ async function loadTracks(){
       duration: t.duration,
     }));
   } catch (err) {
-    console.error('Failed to load track manifest:', err);
+    console.error('Failed to load track manifest for album', album.id, err);
     setStatus('could not load tracks; try refreshing');
     return;
   }
   render();
 }
 
-loadTracks();
+async function loadAlbums(){
+  setStatus('loading tracks…');
+  try {
+    const res = await fetch(ALBUMS_URL, { cache: 'no-store' });
+    if (!res.ok) throw new Error(`albums fetch failed: ${res.status}`);
+    ALBUMS = await res.json();
+  } catch (err){
+    console.error('Failed to load albums.json, falling back to single manifest', err);
+    ALBUMS = [{ id: 'witness', title: 'WITNESS ME IN MY FULL GLORY', theme: 'impact', path: '' }];
+  }
+  if (!ALBUMS.length){
+    setStatus('no albums configured');
+    return;
+  }
+  await switchAlbum(ALBUMS[0]);
+}
+
+loadAlbums();
