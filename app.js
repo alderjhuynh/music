@@ -30,17 +30,30 @@ function setStatus(message){
   totalTimeEl.textContent = '0:00 total';
 }
 
+function syncAuraeaLinks(theme){
+  document.querySelectorAll('a[href*="auraea.fyi"]').forEach((a) => {
+    try{
+      const url = new URL(a.href);
+      url.searchParams.set('theme', theme);
+      a.href = url.toString();
+    } catch {}
+  });
+}
+
 function applyTheme(theme){
+  const doSync = () => syncAuraeaLinks(theme);
   const isInitial = !document.body.dataset.theme;
   const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   if (isInitial || prefersReduced){
     document.body.dataset.theme = theme;
+    doSync();
     return Promise.resolve();
   }
   if (document.startViewTransition){
     try{
       const vt = document.startViewTransition(() => {
         document.body.dataset.theme = theme;
+        doSync();
       });
       return vt.finished.catch(() => {});
     } catch (_){}
@@ -52,6 +65,7 @@ function applyTheme(theme){
     el.style.opacity = '0.18';
     setTimeout(() => {
       document.body.dataset.theme = theme;
+      doSync();
       requestAnimationFrame(() => {
         el.style.opacity = '1';
         setTimeout(() => {

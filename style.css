@@ -14,7 +14,7 @@
 }
 
 /* dh */
-body[data-theme="pastoral"]{
+body[data-theme="desert"]{
   --ink:      #2b2418;
   --ink-dim:  #7d715a;
   --void:     #f3ead9;
@@ -88,7 +88,7 @@ html, body{
     min-height: max(480px, 100dvh);
   }
 }
-body[data-theme="pastoral"] .stage{
+body[data-theme="desert"] .stage{
   transform: none;
 }
 
@@ -107,7 +107,7 @@ body[data-theme="pastoral"] .stage{
   z-index: 3;
 }
 .edge-left{ left: 6px; writing-mode: vertical-rl; transform: rotate(180deg); }
-body[data-theme="pastoral"] .edge-left{
+body[data-theme="desert"] .edge-left{
   font-family: var(--font-mono);
   font-style: italic;
   letter-spacing: 0.03em;
@@ -130,7 +130,7 @@ body[data-theme="pastoral"] .edge-left{
     transition: opacity 650ms ease, visibility 650ms ease;
   }
 }
-body[data-theme="pastoral"] .invert-corner{
+body[data-theme="desert"] .invert-corner{
   opacity: 0;
   visibility: hidden;
 }
@@ -161,6 +161,12 @@ body[data-theme="pastoral"] .invert-corner{
   font-weight: 700;
   font-size: clamp(26px, 3.4vw, 38px);
   letter-spacing: -0.01em;
+}
+.wordmark a{
+  pointer-events: auto;
+  color: inherit;
+  text-decoration: none;
+  cursor: pointer;
 }
 .menu-meta{
   font-size: 12px;
@@ -196,7 +202,7 @@ body[data-theme="pastoral"] .invert-corner{
   color: var(--ink);
   border-bottom-color: var(--ink);
 }
-body[data-theme="pastoral"] .album-switcher{
+body[data-theme="desert"] .album-switcher{
   text-transform: none;
   font-style: italic;
   letter-spacing: 0.02em;
@@ -204,19 +210,19 @@ body[data-theme="pastoral"] .album-switcher{
   gap: 20px;
 }
 
-/* pastoral typography */
-body[data-theme="pastoral"] .wordmark{
+/* desert typography */
+body[data-theme="desert"] .wordmark{
   font-weight: 600;
   font-style: italic;
   letter-spacing: 0;
 }
-body[data-theme="pastoral"] .row-title{
+body[data-theme="desert"] .row-title{
   font-style: italic;
 }
-body[data-theme="pastoral"] .row-index{
+body[data-theme="desert"] .row-index{
   font-style: italic;
 }
-body[data-theme="pastoral"] .now-title{
+body[data-theme="desert"] .now-title{
   font-style: italic;
 }
 
@@ -436,14 +442,14 @@ body[data-album="distant-horizons"] .row-tag{
   .row-attrs{ display: none; }
   .now-bar{ gap: 12px; }
   .edge{ font-size: 11px; }
-  body[data-theme="pastoral"] .stage{ transform: none; }
+  body[data-theme="desert"] .stage{ transform: none; }
 }
 
 @media (max-width: 480px){
   .menu{ padding: 16px 30px; }
   .menu-head{ flex-direction: column; align-items: flex-start; }
   .row-duration{ font-size: 12px; }
-  body[data-theme="pastoral"] .stage{ transform: none; }
+  body[data-theme="desert"] .stage{ transform: none; }
 }
 
 @media (prefers-reduced-motion: reduce){
