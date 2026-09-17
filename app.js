@@ -25,15 +25,15 @@ function fmtTime(s){
 function pad(n){ return String(n).padStart(2, '0'); }
 
 function setStatus(message){
-  listEl.innerHTML = `<div class="list-status">${message}</div>`;
-  trackCountEl.textContent = '0 tracks';
-  totalTimeEl.textContent = '0:00 total';
+  if (listEl) listEl.innerHTML = `<div class="list-status">${message}</div>`;
+  if (trackCountEl) trackCountEl.textContent = '0 tracks';
+  if (totalTimeEl) totalTimeEl.textContent = '0:00 total';
 }
 
 function syncAuraeaLinks(theme){
-  document.querySelectorAll('a[href*="auraea.fyi"]').forEach((a) => {
+  document.querySelectorAll('.wordmark a, a[href*="about/"], a[href*="auraea.fyi"]').forEach((a) => {
     try{
-      const url = new URL(a.href);
+      const url = new URL(a.href, window.location.href);
       url.searchParams.set('theme', theme);
       a.href = url.toString();
     } catch {}
@@ -100,17 +100,24 @@ async function switchAlbum(album){
   current = -1;
   currentAlbum = album;
   document.body.dataset.album = album.id;
-  await applyTheme(album.theme);
+  const urlTheme = new URLSearchParams(window.location.search).get('theme');
+  const isAbout = window.location.pathname.includes('/about');
+  const validThemes = new Set(['desert', 'impact']);
+  const effectiveTheme = (isAbout && validThemes.has(urlTheme)) ? urlTheme : album.theme;
+  await applyTheme(effectiveTheme);
   renderAlbumSwitcher();
-  nowIndex.textContent = '00';
-  nowTitle.textContent = 'nothing loaded';
-  nowTag.textContent = 'choose a track to begin';
-  nowEnter.disabled = true;
-  nowEnter.textContent = 'enter';
+  if (nowIndex) nowIndex.textContent = '00';
+  if (nowTitle) nowTitle.textContent = 'nothing loaded';
+  if (nowTag) nowTag.textContent = 'choose a track to begin';
+  if (nowEnter) {
+    nowEnter.disabled = true;
+    nowEnter.textContent = 'enter';
+  }
   await loadTracksForAlbum(album);
 }
 
 function render(){
+  if (!listEl) return;
   listEl.innerHTML = '';
 
   if (!TRACKS.length){
@@ -142,12 +149,13 @@ function render(){
   });
   updateCurrentStyling();
 
-  trackCountEl.textContent = `${TRACKS.length} track${TRACKS.length === 1 ? '' : 's'}`;
+  if (trackCountEl) trackCountEl.textContent = `${TRACKS.length} track${TRACKS.length === 1 ? '' : 's'}`;
   const total = TRACKS.reduce((sum, t) => sum + t.duration, 0);
-  totalTimeEl.textContent = `${fmtTime(total)} total`;
+  if (totalTimeEl) totalTimeEl.textContent = `${fmtTime(total)} total`;
 }
 
 function updateCurrentStyling(){
+  if (!listEl) return;
   [...listEl.children].forEach((row, i) => {
     row.classList.toggle('is-current', i === current);
     row.setAttribute('aria-selected', i === current ? 'true' : 'false');
@@ -158,24 +166,26 @@ function select(i){
   current = i;
   updateCurrentStyling();
   const t = TRACKS[i];
-  nowIndex.textContent = pad(i + 1);
-  nowTitle.textContent = t.title;
-  nowTag.textContent = `${t.key} · ${t.tempo} bpm · ${fmtTime(t.duration)}`;
-  nowEnter.disabled = false;
-  listEl.children[i].focus();
+  if (nowIndex) nowIndex.textContent = pad(i + 1);
+  if (nowTitle) nowTitle.textContent = t.title;
+  if (nowTag) nowTag.textContent = `${t.key} · ${t.tempo} bpm · ${fmtTime(t.duration)}`;
+  if (nowEnter) nowEnter.disabled = false;
+  if (listEl && listEl.children[i]) listEl.children[i].focus();
 }
 
 function enterTrack(){
   if (current < 0) return;
   const t = TRACKS[current];
-  stage.classList.add('is-launching');
-  nowEnter.disabled = true;
-  nowEnter.textContent = 'loading…';
+  if (stage) stage.classList.add('is-launching');
+  if (nowEnter) {
+    nowEnter.disabled = true;
+    nowEnter.textContent = 'loading…';
+  }
   const albumParam = currentAlbum ? `album=${encodeURIComponent(currentAlbum.id)}&` : '';
   window.location.href = `${VISUALIZER_ORIGIN}/?${albumParam}track=${encodeURIComponent(t.id)}`;
 }
 
-nowEnter.addEventListener('click', enterTrack);
+if (nowEnter) nowEnter.addEventListener('click', enterTrack);
 
 // keyboard nav
 document.addEventListener('keydown', (e) => {
@@ -247,3 +257,18 @@ async function loadAlbums(){
 }
 
 loadAlbums();
+
+(function(){
+  const wordmark = document.querySelector('.wordmark');
+  const homeLink = document.querySelector('.wordmark-link--home');
+  if (!wordmark || !homeLink) return;
+  const addPrimed = () => wordmark.classList.add('wordmark--primed');
+  const removePrimed = () => wordmark.classList.remove('wordmark--primed');
+  homeLink.addEventListener('mouseenter', addPrimed);
+  homeLink.addEventListener('focus', addPrimed);
+  wordmark.addEventListener('mouseleave', removePrimed);
+  wordmark.addEventListener('focusout', (e) => {
+    if (!wordmark.contains(e.relatedTarget)) removePrimed();
+  });
+  homeLink.addEventListener('click', addPrimed);
+})();

@@ -161,12 +161,91 @@ body[data-theme="desert"] .invert-corner{
   font-weight: 700;
   font-size: clamp(26px, 3.4vw, 38px);
   letter-spacing: -0.01em;
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0;
+  position: relative;
+  /* so the expand doesnt get cooked when moving between links*/
+  padding-right: 0.2em;
 }
-.wordmark a{
+.wordmark a,
+.wordmark .wordmark-link{
   pointer-events: auto;
   color: inherit;
   text-decoration: none;
   cursor: pointer;
+}
+.wordmark-link--home{
+  position: relative;
+}
+.wordmark-link--home::after{
+  content: '';
+  position: absolute;
+  top: -4px;
+  right: -12px;
+  bottom: -4px;
+  width: 14px;
+}
+.wordmark-options{
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.32em;
+  max-width: 0;
+  opacity: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  transform: translateX(-6px);
+  pointer-events: none;
+  margin-left: 0;
+  visibility: hidden;
+  position: relative;
+  transition: max-width 380ms cubic-bezier(0.4,0,0.2,1), opacity 200ms ease, transform 360ms cubic-bezier(0.4,0,0.2,1), margin 380ms cubic-bezier(0.4,0,0.2,1), visibility 0s linear 380ms;
+}
+.wordmark-sep{
+  color: var(--ink-dim);
+  font-weight: 400;
+  font-size: 0.72em;
+  align-self: center;
+  opacity: 0.9;
+}
+.wordmark-link--home:hover + .wordmark-options,
+.wordmark-options:hover,
+.wordmark-options:focus-within,
+.wordmark:focus-within .wordmark-options,
+.wordmark:has(.wordmark-link--home:hover) .wordmark-options,
+.wordmark:has(.wordmark-options:hover) .wordmark-options,
+.wordmark--primed:hover .wordmark-options,
+.wordmark--primed:focus-within .wordmark-options{
+  max-width: 200px;
+  opacity: 1;
+  transform: translateX(0);
+  pointer-events: auto;
+  margin-left: 0.34em;
+  visibility: visible;
+  transition: max-width 380ms cubic-bezier(0.4,0,0.2,1), opacity 220ms ease 60ms, transform 360ms cubic-bezier(0.4,0,0.2,1), margin 380ms cubic-bezier(0.4,0,0.2,1), visibility 0s;
+}
+.wordmark-link:hover,
+.wordmark-link:focus-visible{
+  text-decoration: underline;
+  text-underline-offset: 0.18em;
+  text-decoration-thickness: 0.07em;
+  text-decoration-color: var(--line-dim-2);
+  outline: none;
+}
+.wordmark:not(:hover):not(:focus-within) .wordmark-options{
+  transition-delay: 0s, 0s, 0s, 0s, 0s;
+}
+@media (hover: none){
+  .wordmark-options{
+    transition: none;
+    transform: none;
+  }
+}
+@media (prefers-reduced-motion: reduce){
+  .wordmark-options{
+    transition: none;
+    transform: none;
+  }
 }
 .menu-meta{
   font-size: 12px;
