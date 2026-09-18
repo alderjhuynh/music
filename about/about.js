@@ -1,4 +1,4 @@
-const VALID_THEMES = new Set(['desert', 'impact']);
+const VALID_THEMES = new Set(['desert', 'impact', 'rave', 'dance']);
 
 function parseURLTheme() {
     const param = new URLSearchParams(window.location.search).get('theme');
@@ -21,6 +21,16 @@ const words = {
         "Hey!",
         "Curious about the album or me? You're in the right place!",
         "sorry yall the rest of the text is coming later ;-;"
+    ],
+    rave: [
+        "Hey!",
+        "Curious about the album or me? You're in the right place!",
+        "sorry yall the rest of the text is coming later ;-;"
+    ],
+    dance: [
+        "Hey!",
+        "Curious about the album or me? You're in the right place!",
+        "sorry yall the rest of the text is coming later ;-;"
     ]
 }
 
@@ -31,7 +41,7 @@ function injectText(theme) {
     if (effectiveTheme) document.body.dataset.theme = effectiveTheme;
     
 
-    const paragraphs = effectiveTheme === 'impact' ? words.impact : words.desert;
+    const paragraphs = (effectiveTheme && words[effectiveTheme]) ? words[effectiveTheme] : (effectiveTheme === 'impact' ? words.impact : words.desert);
     paragraphEl.innerHTML = "";
 
     paragraphs.forEach(text => {

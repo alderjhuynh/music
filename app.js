@@ -102,7 +102,7 @@ async function switchAlbum(album){
   document.body.dataset.album = album.id;
   const urlTheme = new URLSearchParams(window.location.search).get('theme');
   const isAbout = window.location.pathname.includes('/about');
-  const validThemes = new Set(['desert', 'impact']);
+  const validThemes = new Set(['desert', 'impact', 'rave', 'dance']);
   const effectiveTheme = (isAbout && validThemes.has(urlTheme)) ? urlTheme : album.theme;
   await applyTheme(effectiveTheme);
   renderAlbumSwitcher();
@@ -261,6 +261,7 @@ loadAlbums();
 (function(){
   const wordmark = document.querySelector('.wordmark');
   const homeLink = document.querySelector('.wordmark-link--home');
+  const aboutLink = document.querySelector('.wordmark-link--about');
   if (!wordmark || !homeLink) return;
   const addPrimed = () => wordmark.classList.add('wordmark--primed');
   const removePrimed = () => wordmark.classList.remove('wordmark--primed');
@@ -271,4 +272,50 @@ loadAlbums();
     if (!wordmark.contains(e.relatedTarget)) removePrimed();
   });
   homeLink.addEventListener('click', addPrimed);
+
+  // hover alt for mobile (forgot mobile users exist)
+  const coarseMql = window.matchMedia('(hover: none), (pointer: coarse)');
+  const isCoarse = () => coarseMql.matches;
+  const isOpen = () => wordmark.classList.contains('wordmark--open');
+  const setOpen = (open) => {
+    wordmark.classList.toggle('wordmark--open', open);
+    homeLink.setAttribute('aria-expanded', String(open));
+  };
+  homeLink.setAttribute('aria-expanded', 'false');
+  homeLink.setAttribute('aria-haspopup', 'true');
+
+  homeLink.addEventListener('click', (e) => {
+    if (!isCoarse()) return;
+    if (!isOpen()) {
+      e.preventDefault();
+      setOpen(true);
+      addPrimed();
+    }
+  });
+
+  document.addEventListener('click', (e) => {
+    if (!isOpen()) return;
+    if (wordmark.contains(e.target)) return;
+    setOpen(false);
+    removePrimed();
+  });
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && isOpen()) {
+      setOpen(false);
+      removePrimed();
+      homeLink.focus();
+    }
+  });
+  if (aboutLink) {
+    aboutLink.addEventListener('click', () => setOpen(false));
+  }
+  if (coarseMql.addEventListener) {
+    coarseMql.addEventListener('change', () => {
+      if (!isCoarse() && isOpen()) setOpen(false);
+    });
+  } else if (coarseMql.addListener) {
+    coarseMql.addListener(() => {
+      if (!isCoarse() && isOpen()) setOpen(false);
+    });
+  }
 })();
