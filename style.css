@@ -385,7 +385,8 @@ body[data-theme="desert"] .now-title{
   overflow: hidden;
   text-overflow: ellipsis;
 }
-body[data-album="distant-horizons"] .row-tag{
+body[data-album="distant-horizons"] .row-tag,
+body[data-album="dance"] .row-tag{
   display: none;
 }
 

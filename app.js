@@ -131,7 +131,7 @@ function render(){
     row.setAttribute('role', 'option');
     row.setAttribute('aria-selected', i === current ? 'true' : 'false');
     row.dataset.index = i;
-    const hideTag = currentAlbum && currentAlbum.id === 'distant-horizons';
+    const hideTag = currentAlbum && (currentAlbum.id === 'distant-horizons' || currentAlbum.id === 'dance');
     row.innerHTML = `
       <div class="row-index">${pad(i + 1)}</div>
       <div class="row-body">
