@@ -247,9 +247,20 @@ canvas#waveCanvas{ width: 100%; height: 100%; display: block; }
 }
 .tile-grid{
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(min(100%, 250px), 1fr));
-  gap: 26px 22px;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(160px, 1fr);
+  grid-template-rows: minmax(0, auto);
+  gap: 22px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 6px 2px 12px;
+  scroll-snap-type: x proximity;
+  scrollbar-width: thin;
+  scrollbar-color: var(--line-dim) transparent;
 }
+.tile-grid::-webkit-scrollbar{ height: 6px; }
+.tile-grid::-webkit-scrollbar-thumb{ background: var(--line-dim); border-radius: 3px; }
+.tile-grid::-webkit-scrollbar-track{ background: transparent; }
 .tile{
   position: relative;
   display: flex; flex-direction: column;
@@ -260,6 +271,8 @@ canvas#waveCanvas{ width: 100%; height: 100%; display: block; }
   font-family: var(--font-mono);
   transition: transform .18s ease, background-color .18s, color .18s, box-shadow .18s;
   box-shadow: 4px 4px 0 rgba(11,11,11,.07);
+  min-width: 0;
+  scroll-snap-align: start;
 }
 .tile:hover{ transform: translate(-2px,-2px); box-shadow: 6px 6px 0 rgba(11,11,11,.14); }
 .tile-bar{
@@ -268,7 +281,8 @@ canvas#waveCanvas{ width: 100%; height: 100%; display: block; }
   height: 24px; padding: 0 8px;
   font-size: 10px; font-weight: 700; white-space: nowrap; overflow: hidden;
 }
-.tile-bar span:last-child{ font-weight: 400; opacity: .7; }
+.tile-bar span:first-child{ overflow: hidden; text-overflow: ellipsis; }
+.tile-bar span:last-child{ font-weight: 400; opacity: .7; flex-shrink: 0; }
 .tile-wave{ height: 70px; border-bottom: 1px solid var(--line-dim); }
 .tile-wave canvas{ width: 100%; height: 100%; display: block; }
 .tile-body{ padding: 10px 12px 12px; display: flex; flex-direction: column; gap: 6px; }

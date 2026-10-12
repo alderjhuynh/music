@@ -160,15 +160,9 @@ function renderTiles() {
 }
 
 function fillSlots() {
+  // Single-line horizontal strip: no filler slots needed.
+  // Just clean up any legacy slots.
   els.grid.querySelectorAll('.tile.slot').forEach((n) => n.remove());
-  if (!tracks.length) return;
-  const cols = getComputedStyle(els.grid).gridTemplateColumns.split(' ').filter(Boolean).length || 1;
-  const missing = (cols - (tracks.length % cols)) % cols;
-  for (let i = 0; i < missing; i++) {
-    const s = document.createElement('div');
-    s.className = 'tile slot'; s.setAttribute('aria-hidden', 'true');
-    els.grid.appendChild(s);
-  }
 }
 
 function drawThumb(t) {
