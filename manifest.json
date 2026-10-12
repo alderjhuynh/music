@@ -1,0 +1,68 @@
+[
+  {
+    "id": "98dbab3ef2",
+    "title": "Opening",
+    "tag": "grandeur and hubris never stray too far from each other",
+    "file": "tracks/OPENING.mp3",
+    "data": "data/98dbab3ef2.json",
+    "duration": 215.20204081632653,
+    "key": "D# Major",
+    "tempo": 129.2,
+    "available": true
+  },
+  {
+    "id": "9f2c5f7b76",
+    "title": "Pierce the Heavens",
+    "tag": "do not trust a GOD to deal with matters of the soul",
+    "file": "tracks/PIERCE_THE_HEAVENS.mp3",
+    "data": "data/9f2c5f7b76.json",
+    "duration": 203.53351473922902,
+    "key": "D Minor",
+    "tempo": 123.05,
+    "available": true
+  },
+  {
+    "id": "83166977ce",
+    "title": "Descent into Madness",
+    "tag": "immortality is not a gift",
+    "file": "tracks/DESCENT INTO MADNESS.mp3",
+    "data": "data/83166977ce.json",
+    "duration": 199.5010430839002,
+    "key": "E Minor",
+    "tempo": 99.38,
+    "available": true
+  },
+  {
+    "id": "d96041c54c",
+    "title": "Fame and Fortune",
+    "tag": "seek something higher, rise above them all",
+    "file": "tracks/FAME AND FORTUNE.mp3",
+    "data": "data/d96041c54c.json",
+    "duration": 194.21351473922903,
+    "key": "G# Major",
+    "tempo": 136.0,
+    "available": true
+  },
+  {
+    "id": "63ab7fd5bb",
+    "title": "Return to the Beginning",
+    "tag": "open your eyes, cast aside your blindfold and see",
+    "file": "tracks/RETURN_TO_THE_BEGINNING.mp3",
+    "data": "data/63ab7fd5bb.json",
+    "duration": 235.32204081632653,
+    "key": "E Minor",
+    "tempo": 95.7,
+    "available": true
+  },
+  {
+    "id": "974c8d3e15",
+    "title": "Closing",
+    "tag": "he is upon us, save yourself",
+    "file": "tracks/CLOSING.mp3",
+    "data": "data/974c8d3e15.json",
+    "duration": 198.77351473922903,
+    "key": "A# Minor",
+    "tempo": 129.2,
+    "available": true
+  }
+]
